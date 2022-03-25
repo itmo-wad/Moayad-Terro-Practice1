@@ -1,13 +1,23 @@
-from flask import Flask, jsonify, render_template, request, session, redirect, url_for
+import os
+from flask import Flask, flash, render_template, request, session, redirect, url_for, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
 from pymongo import MongoClient
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
+# session and uploaded folder
 app.secret_key = 'W8wfyR2ERM'
 app.config['SESSION_TYPE'] = 'filesystem'
+app.config['UPLOAD_FOLDER'] = './upload'
 
+# for db and connection
 client  = MongoClient('localhost',27017)
 db = client.db1
+
+# for image type uploaded
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 # just for testing purpose
@@ -16,14 +26,14 @@ def hello_world():
     return "Hello world!"
 
 
-# just for testing purpose
-@app.route('/login')
-def redirect_login():
-    return redirect(url_for(".login"))
+# render home
+@app.route('/')
+def home():
+    return render_template("index.html")
 
 
 
-@app.route('/profile')
+@app.route('/auth')
 def profile():
     if session['username']:
         username = session['username']
@@ -33,17 +43,18 @@ def profile():
 
 
 # render login form
-@app.route("/", methods=["GET", "POST"])
+@app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         username = request.form.get("username", "")
         password = request.form.get("password", "")
-        user = db.users.find_one({"username":username,"password":password})
-        if user:
+        user = db.users.find_one({"username":username})
+        if user and check_password_hash(user.get('password'),password):
             session['username'] = user.get('username')
             return redirect(url_for('.profile')) 
-        else:
-            return redirect('/')   
+        else:   
+            flash('Username or password incorrect!')
+            return redirect(request.url)
     else:
         if session['username']:
             return redirect(url_for('.profile'))
@@ -52,17 +63,25 @@ def login():
 
 
 # render login form
-@app.route("/register", methods=["GET", "POST"])
+@app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
+        name = request.form.get("name", "")
         username = request.form.get("username", "")
         password = request.form.get("password", "")
-        user = db.users.find_one({"username":username,"password":password})
+        user = db.users.find_one({"username":username})
         if user:
-            session['username'] = user.get('username')
-            return redirect(url_for('.profile')) 
+            flash('Username already exist!')
+            return redirect(request.url)
         else:
-            return redirect('/')   
+            # here write  sign up logic
+            db.users.insert_one({
+                "name":name,
+                "username":username,
+                "password":generate_password_hash(password)
+            })
+            flash('Account created! Please login')
+            return redirect(url_for(".login"))   
     else:
         if session['username']:
             return redirect(url_for('.profile'))
@@ -76,6 +95,68 @@ def signup():
 def logout():
     session['username'] = None
     return redirect('/');  
+
+
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('No file part', 'danger')
+            return redirect(request.url)
+            
+        file = request.files['file']
+        if file.filename == '':
+            flash('No selected file', 'danger')
+            return redirect(request.url)
+            
+        if not allowed_file(file.filename):
+            flash('Invalid file extension', 'danger')
+            return redirect(request.url)
+            
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            
+            flash('Successfully saved', 'success')
+            return redirect(url_for('uploaded_file', filename=filename))
+        
+            
+    return render_template("upload.html")
+
+
+
+
+@app.route('/uploaded/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
+@app.route('/notebook', methods=['GET', 'POST','DELETE'])
+def notebook():
+    if request.method == 'POST':
+        note = request.form.get("note", "")
+        db.notes.insert_one({
+            "note":note,
+        })
+        flash('note added successfully!')
+        return redirect(request.url)
+
+    elif request.method =="DELETE":
+        flash('note deleted successfully!')
+        return redirect(request.url)
+    perPage =int(request.args.get("perPage", "10"))
+    notes = db.notes.find().limit (perPage)
+    print(notes)
+    return render_template('notebook.html',data=notes)
+
+
+@app.route('/notebook/delete', methods=['POST'])
+def notebook_delete():
+    db.notes.delete_many({})
+    flash('note deleted successfully!')
+    return redirect(url_for(".notebook"))
+
 
 
 if __name__ == '__main__':

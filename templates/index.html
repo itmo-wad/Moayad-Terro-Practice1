@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Home Page</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static',filename='styles/home.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static',filename='styles/main.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Welcome to My app!</h1>
+      <p>Please select where do you want to go</p>
+      <ul>
+        <li><a href="/login">Login</a></li>
+        <li><a href="/signup">Create Account</a></li>
+        <li><a href="/upload">Uplode Center</a></li>
+        <li><a href="/notebook">notebook</a></li>
+        <li><a href="/chatbot">chatbot</a></li>
+      </ul>
+    </div>
+  </body>
+</html>

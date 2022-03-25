@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>login</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static',filename='styles/notes.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static',filename='styles/main.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <a href="/">back to home</a>
+      <h3>Welocme, Please add your notes!</h3>
+      <!-- error flush messages -->
+      {% with messages = get_flashed_messages() %} {% if messages %}
+      <div class="errors-container">
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+      </div>
+      {% endif %} {% endwith %}
+      <!-- end error flush messages -->
+      <form method="POST" action="/notebook">
+        <textarea
+          name="note"
+          type="text"
+          placeholder="Add note"
+          required
+          rows="4"
+        ></textarea>
+        <button type="submit" class="normal-btn">Add note</button>
+      </form>
+    </div>
+    <form method="POST" action="/notebook/delete">
+      <button type="submit" class="error-btn">delete all</button>
+    </form>
+
+    <form method="GET" action="/notebook">
+      <div class="pagination">
+        <input name="perPage" type="number" placeholder="per page" value="10" />
+        <button type="submit">get items</button>
+      </div>
+    </form>
+
+    <div>
+      {% for message in data %}
+      <p>{{ message.note }}</p>
+      {% endfor %}
+    </div>
+  </body>
+</html>
