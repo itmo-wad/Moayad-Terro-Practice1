@@ -1,8 +1,12 @@
 # Moayad-Terro-Practice1
 Hello There!
-I did the required and the optional tasks\n
-After installing dependencies, just run app.py\n
-Make sure that you have connection with your local DB, I used mangoDB!\n
+
+I did the required and the optional tasks
+
+After installing dependencies, just run app.py
+
+Make sure that you have connection with your local DB, I used mangoDB!
+
 python3, flask and pymongo are required also!\n
 
 Home Page
