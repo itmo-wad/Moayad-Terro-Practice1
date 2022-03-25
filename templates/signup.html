@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sign up</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static',filename='styles/signup.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static',filename='styles/main.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Create new account</h1>
+      <form method="POST" action="/">
+        <input name="name" placeholder="Full name" required />
+        <input name="username" placeholder="Username" required />
+        <input
+          name="password"
+          type="password"
+          placeholder="Password"
+          required
+        />
+        <button type="submit" class="form-btn">Create now!</button>
+      </form>
+      <div class="register-area">
+        <p>Already have an account</p>
+        <a href="/login">Login now!</a>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>login</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static',filename='styles/login.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static',filename='styles/main.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Welocme, Please Login!</h1>
+      <form method="POST" action="/">
+        <input name="username" placeholder="Username" required />
+        <input
+          name="password"
+          type="password"
+          placeholder="Password"
+          required
+        />
+        <button type="submit" class="form-btn">Login</button>
+      </form>
+      <div class="register-area">
+        <p>Don't have an account</p>
+        <a href="/register">Register now!</a>
+      </div>
+    </div>
+  </body>
+</html>
