@@ -56,7 +56,7 @@ def login():
             flash('Username or password incorrect!')
             return redirect(request.url)
     else:
-        if session['username']:
+        if session.get('username'):
             return redirect(url_for('.profile'))
         else:
             return render_template("login.html")
@@ -83,7 +83,7 @@ def signup():
             flash('Account created! Please login')
             return redirect(url_for(".login"))   
     else:
-        if session['username']:
+        if session.get('username'):
             return redirect(url_for('.profile'))
         else:
             return render_template("signup.html")
